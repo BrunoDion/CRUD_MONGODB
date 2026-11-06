@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10241e">
+  <title>MongoLab | CRUD de Clientes</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="top-inner">
+      <a class="brand" href="/" aria-label="MongoLab — início"><span class="brand-icon">◆</span><span>Mongo<span class="accent">Lab</span><small>PROJETO DE AULA</small></span></a>
+      <div class="connection"><span class="dot" id="connection-dot"></span><span id="connection-label">Conectando...</span></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">BANCO DE DADOS II · NODE.JS + MONGODB</div>
+        <h1>Um CRUD. <span>Infinitas estruturas.</span></h1>
+        <p>Cadastre clientes, edite documentos e descubra como uma mesma coleção pode guardar diferentes campos, arrays e objetos incorporados.</p>
+      </div>
+      <div class="hero-card"><span>COLEÇÃO ATIVA</span><strong>clientes</strong><small>Banco <code id="nome-banco">sistema_pedidos</code></small></div>
+    </section>
+
+    <section class="stats" aria-label="Resumo do banco">
+      <div class="stat"><span>Clientes cadastrados</span><strong id="stat-clientes">—</strong><small>Documentos</small></div>
+      <div class="stat"><span>Estruturas diferentes</span><strong id="stat-estruturas">—</strong><small>Combinações de campos</small></div>
+      <div class="stat"><span>Campos adicionais</span><strong id="stat-extras">—</strong><small>Além dos dados básicos</small></div>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Coleções">
+      <button id="tab-clientes" class="tab selected" role="tab" aria-selected="true">▦ &nbsp;Clientes <span class="tab-suffix">CRUD completo</span></button>
+      <button id="tab-pedidos" class="tab" role="tab" aria-selected="false">▤ &nbsp;Pedidos <span class="tab-suffix">Leitura e JSON</span></button>
+    </div>
+
+    <section id="painel-clientes" class="main-grid" aria-label="CRUD de clientes">
+      <div class="panel">
+        <div class="panel-head"><div><h2>Clientes</h2><p>Clique para ver a estrutura e editar.</p></div><button class="btn-secondary" id="recarregar-clientes">↻ Atualizar</button></div>
+        <div class="list-tools"><input type="search" id="busca" placeholder="Buscar por nome ou cidade..." aria-label="Buscar clientes"><span id="contador-lista">0 resultados</span></div>
+        <div class="scroll-table"><table><thead><tr><th>Cliente</th><th>Cidade</th><th>Campos extras</th><th></th></tr></thead><tbody id="lista-clientes"><tr><td colspan="4">Carregando...</td></tr></tbody></table></div>
+        <div class="tip">💡 <strong>Observe:</strong> Maria tem endereço incorporado, Ana tem um array de endereços e Julia possui tags. Todos estão na mesma coleção!</div>
+      </div>
+
+      <div class="right-column">
+        <section class="panel" aria-label="Formulário de cliente">
+          <div class="panel-head"><div><h2 id="titulo-formulario">Novo cliente</h2><p>Somente nome e cidade são necessários neste formulário.</p></div><button class="btn-quiet" id="novo-cliente">+ Novo</button></div>
+          <form id="form-cliente" autocomplete="off">
+            <div class="field"><label for="nome">Nome <b>*</b></label><input id="nome" maxlength="150" minlength="2" required placeholder="Ex.: Lucas Pereira"></div>
+            <div class="field"><label for="cidade">Cidade <b>*</b></label><input id="cidade" maxlength="150" minlength="2" required placeholder="Ex.: Guarapuava"></div>
+            <div class="field-two"><div class="field"><label for="telefone">Telefone</label><input id="telefone" maxlength="150" placeholder="Opcional"></div><div class="field"><label for="email">E-mail</label><input id="email" maxlength="150" placeholder="Opcional"></div></div>
+            <div class="flexible-head"><label for="extras">Campos extras <span class="json-tag">JSON</span></label><span class="hint">Objetos e arrays permitidos</span></div>
+            <textarea id="extras" spellcheck="false" rows="7" aria-label="Campos extras em JSON" placeholder='{"tags": ["vip", "indicacao"]}'>{}</textarea>
+            <div class="presets-label">Experimente adicionar uma estrutura:</div>
+            <div class="presets"><button class="chip" type="button" data-exemplo="tags">+ Tags</button><button class="chip" type="button" data-exemplo="empresa">+ Empresa</button><button class="chip" type="button" data-exemplo="preferencias">+ Preferências</button><button class="chip" type="button" data-exemplo="enderecos">+ Endereços</button></div>
+            <p class="form-note">Os campos acima podem mudar de cliente para cliente, sem alterar a estrutura dos demais documentos.</p>
+            <button class="btn-primary" type="submit" id="salvar-cliente">Cadastrar cliente</button>
+            <button class="btn-danger" type="button" id="excluir-cliente" hidden>Excluir este cliente</button>
+          </form>
+        </section>
+        <section class="panel json-panel"><div class="panel-head"><div><h2>Documento selecionado</h2><p>Representação JSON retornada pelo MongoDB.</p></div><span class="json-tag">VISUALIZAÇÃO</span></div><div id="estrutura-atual" class="estrutura-atual">Selecione um cliente na lista.</div><pre id="json-cliente">// Selecione um cliente à esquerda</pre></section>
+      </div>
+    </section>
+
+    <section id="painel-pedidos" class="main-grid" hidden aria-label="Consulta de pedidos">
+      <div class="panel"><div class="panel-head"><div><h2>Pedidos</h2><p>Exemplos de arrays e subdocumentos incorporados.</p></div><button class="btn-secondary" id="recarregar-pedidos">↻ Atualizar</button></div><div class="scroll-table"><table><thead><tr><th>Pedido</th><th>Cliente</th><th>Status</th><th>Total</th></tr></thead><tbody id="lista-pedidos"><tr><td colspan="4">Carregando...</td></tr></tbody></table></div><div class="tip">📦 <strong>Exemplo:</strong> todos os pedidos têm <code>itens</code> como array, mas alguns têm <code>pagamento</code>, <code>entrega</code>, <code>tags</code>, <code>avaliacao</code> etc.</div></div>
+      <div class="panel json-panel"><div class="panel-head"><div><h2>Documento do pedido</h2><p>Observe os objetos e arrays aninhados.</p></div><span class="json-tag">SOMENTE LEITURA</span></div><div id="campos-pedido" class="estrutura-atual">Selecione um pedido para inspecionar.</div><pre id="json-pedido">// Selecione um pedido à esquerda</pre></div>
+    </section>
+
+    <footer>Projeto educacional · Banco de Dados II · HTML, CSS, JavaScript e Node.js puro · MongoDB local ou Atlas</footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
